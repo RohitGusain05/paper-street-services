@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin — Paper Street Services</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-wrap{min-height:100vh;background:#0b0809}.admin-head{padding:24px 5vw;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.admin-title{font-family:var(--serif);font-size:32px}.admin-main{padding:40px 5vw}.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}.stat{border:1px solid var(--line);padding:22px;background:#110c0e}.stat small{color:#91827b}.stat strong{display:block;font-size:30px;margin-top:8px}.admin-panel{border:1px solid var(--line);background:#0e0a0b}.panel-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.orders{display:grid}.order-row{display:grid;grid-template-columns:1.2fr 1fr .8fr .8fr auto;gap:16px;padding:20px 22px;border-bottom:1px solid var(--line);align-items:center}.order-row:last-child{border-bottom:0}.order-name{font-weight:700}.order-meta{font-size:12px;color:#9e9089}.badge{display:inline-flex;width:max-content;padding:5px 9px;border-radius:999px;font-size:11px;border:1px solid rgba(244,238,229,.16)}.badge.pending{color:#d9b4a9}.badge.progress{color:#9dc095}.empty{padding:55px 25px;text-align:center;color:#8e8079}.empty h3{font-family:var(--serif);font-size:26px;color:#ded2ca;margin:0 0 7px}.admin-note{margin-top:20px;color:#776b65;font-size:12px;max-width:700px}@media(max-width:800px){.admin-stats{grid-template-columns:1fr 1fr}.order-row{grid-template-columns:1fr 1fr}.order-row .action{grid-column:1/-1}}@media(max-width:500px){.admin-stats{grid-template-columns:1fr}.admin-head{align-items:flex-start;gap:15px;flex-direction:column}}
+  </style>
+</head>
+<body><div class="admin-wrap">
+<header class="admin-head"><div><div class="eyebrow">PAPER STREET SERVICES</div><div class="admin-title">Admin Dashboard</div></div><a class="btn btn-secondary" href="index.html">View Website →</a></header>
+<main class="admin-main">
+<section class="admin-stats"><div class="stat"><small>New Orders</small><strong>—</strong></div><div class="stat"><small>Payment Pending</small><strong>—</strong></div><div class="stat"><small>Paid / In Progress</small><strong>—</strong></div><div class="stat"><small>Completed</small><strong>—</strong></div></section>
+<section class="admin-panel"><div class="panel-head"><strong>Active Orders</strong><span class="order-meta">Earliest deadline first</span></div><div class="orders"><div class="empty"><h3>Your orders will appear here.</h3><p>The live database, secure admin authentication, file storage and deadline sorting will be connected in the backend stage.</p></div></div></section>
+<p class="admin-note">This dashboard is intentionally only a UI shell for now. Customer documents and credentials will not be stored in this public repository. The production version will use authenticated server-side storage.</p>
+</main></div></body></html>

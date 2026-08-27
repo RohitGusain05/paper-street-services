@@ -3,13 +3,8 @@
 
 create extension if not exists pgcrypto;
 
-do $$ begin
-  create type public.order_status as enum ('new','paid','in_progress','completed','deleted');
-exception when duplicate_object then null; end $$;
-
-do $$ begin
-  create type public.payment_status as enum ('pending','paid');
-exception when duplicate_object then null; end $$;
+do $$ begin create type public.order_status as enum ('new','paid','in_progress','completed','deleted'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.payment_status as enum ('pending','paid'); exception when duplicate_object then null; end $$;
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
@@ -29,12 +24,8 @@ create table if not exists public.orders (
   deleted_at timestamptz
 );
 
-create index if not exists orders_active_deadline_idx
-  on public.orders (deadline asc nulls last, created_at asc)
-  where status in ('paid','in_progress');
-create index if not exists orders_completed_idx
-  on public.orders (completed_at desc)
-  where status = 'completed';
+create index if not exists orders_active_deadline_idx on public.orders (deadline asc nulls last, created_at asc) where status in ('paid','in_progress');
+create index if not exists orders_completed_idx on public.orders (completed_at desc) where status = 'completed';
 
 create table if not exists public.order_files (
   id uuid primary key default gen_random_uuid(),
@@ -45,41 +36,30 @@ create table if not exists public.order_files (
   size_bytes bigint,
   created_at timestamptz not null default now()
 );
-
 create index if not exists order_files_order_idx on public.order_files(order_id);
 
-create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
-
+create or replace function public.set_updated_at() returns trigger language plpgsql as $$ begin new.updated_at = now(); return new; end; $$;
 drop trigger if exists orders_updated_at on public.orders;
-create trigger orders_updated_at before update on public.orders
-for each row execute function public.set_updated_at();
+create trigger orders_updated_at before update on public.orders for each row execute function public.set_updated_at();
 
 alter table public.orders enable row level security;
 alter table public.order_files enable row level security;
 
--- Only authenticated admins can access order records directly.
--- Public customers submit through a server-side Edge Function, not direct table access.
 drop policy if exists "authenticated admins can read orders" on public.orders;
-create policy "authenticated admins can read orders"
-on public.orders for select to authenticated using (true);
-
+create policy "authenticated admins can read orders" on public.orders for select to authenticated using (true);
 drop policy if exists "authenticated admins can update orders" on public.orders;
-create policy "authenticated admins can update orders"
-on public.orders for update to authenticated using (true) with check (true);
-
+create policy "authenticated admins can update orders" on public.orders for update to authenticated using (true) with check (true);
 drop policy if exists "authenticated admins can delete orders" on public.orders;
-create policy "authenticated admins can delete orders"
-on public.orders for delete to authenticated using (true);
-
+create policy "authenticated admins can delete orders" on public.orders for delete to authenticated using (true);
 drop policy if exists "authenticated admins can read order files" on public.order_files;
-create policy "authenticated admins can read order files"
-on public.order_files for select to authenticated using (true);
+create policy "authenticated admins can read order files" on public.order_files for select to authenticated using (true);
 
--- Create a PRIVATE Supabase Storage bucket named `order-files`.
--- Never put customer documents in this GitHub repository or a public bucket.
+-- Storage: create a PRIVATE bucket named `order-files` in Supabase Storage.
+-- The following policies let authenticated admins download/delete files, while anonymous visitors cannot.
+drop policy if exists "authenticated admins can read private order files" on storage.objects;
+create policy "authenticated admins can read private order files" on storage.objects for select to authenticated using (bucket_id = 'order-files');
+drop policy if exists "authenticated admins can delete private order files" on storage.objects;
+create policy "authenticated admins can delete private order files" on storage.objects for delete to authenticated using (bucket_id = 'order-files');
+
+-- Public customers upload through the Edge Function using the service-role key on the server.
+-- Never expose that service-role key in frontend code.

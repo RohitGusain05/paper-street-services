@@ -49,13 +49,16 @@ if (form) {
         const result = await response.json();
         if (!response.ok || !result.ok) throw new Error(result.error || 'Order could not be saved.');
         orderCode = result.order?.order_code || '';
+      } else {
+        throw new Error('Website backend is not connected yet.');
       }
+
       const message = [
         'Hello Paper Street Services! I want to place an order.', '',
         `Name: ${name}`, `My WhatsApp: ${whatsapp}`, `Service: ${serviceRaw}`,
         `Deadline: ${deadline}`, `How I want it designed: ${requirements}`,
-        `Reference files: ${fileNames}`, orderCode ? `Order ID: ${orderCode}` : ''
-      ].filter(Boolean).join('\n');
+        `Reference files: ${fileNames}`, `Order ID: ${orderCode}`
+      ].join('\n');
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
       form.reset();
     } catch (error) {
